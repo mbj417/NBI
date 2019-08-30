@@ -1007,7 +1007,7 @@ class Server(object):
 
                         global subscription_thread
                         subscription_thread.subscribe("pla", "suggestions", pla_callback)
-                        self.engine.msg.write("pla", "get_suggestions", indata);
+                        self.engine.msg.write("pla", "get_suggestions", { 'session' : engine_session, 'nsParams': indata });
                         wait = 30
                         while not pla_suggestions['received']:
                             time.sleep(1)
