@@ -995,23 +995,21 @@ class Server(object):
                         cherrypy.response.headers["Transaction-Id"] = _id
                     outdata = {"id": _id}
                 elif topic == "ns_instances_content":
+                    cherrypy.log.error("Instantiation received: indata = {}, kwargs = {}".format(json.dumps(indata), json.dumps(kwargs)))
                     pla_suggestions = { 'received' : False, 'suggestions' : [] }
                     def pla_callback(topic, command, data):
-                        pla_suggestions["suggestions"] = data["suggestions"]
-                        pla_suggestions["received"] = True
+                        pla_suggestions['suggestions'] = data['suggestions']
+                        pla_suggestions['received'] = True
 
                     global subscription_thread
                     subscription_thread.subscribe("pla", "suggestions", pla_callback)
                     self.engine.msg.write("pla", "get_suggestions", indata);
-                    while True:
+                    while not pla_suggestions['received']:
                         time.sleep(1)
-                        if pla_suggestions["received"]:
-                            break
                     subscription_thread.unsubscribe("pla", "suggestions")
-                    cherrypy.log.error("PLA suggestions received: {}".format(json.dumps(pla_suggestions)))
+                    cherrypy.log.error("PLA suggestions received: {}".format(json.dumps(pla_suggestions['suggestions'])))
                     # use first suggestion
-                    placement = pla_suggestions["suggestions"][0]["placement"]
-                    indata["vnf"] = placement
+                    indata.update(pla_suggestions['suggestions'][0])
                     # creates NSR
                     _id = self.engine.new_item(rollback, engine_session, engine_topic, indata, kwargs)
                     # creates nslcmop
