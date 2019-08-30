@@ -1,0 +1,2 @@
+git+https://osm.etsi.org/gerrit/osm/IM.git#egg=osm-im
+git+https://osm.etsi.org/gerrit/osm/common.git#egg=osm-common

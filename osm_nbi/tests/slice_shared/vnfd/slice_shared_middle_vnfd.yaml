@@ -1,0 +1,77 @@
+# Copyright [2019] [Pol Alemany, Ricard Vilalta (CTTC), Felipe Vicens (ATOS)]
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+vnfd-catalog:
+    vnfd:
+    -   id: slice_hackfest_middle_vnfd
+        name: slice_hackfest_middle_vnfd
+        short-name: slice_hackfest_middle_vnfd
+        description: VNFD with 3 CPs to be used on Slice Session of the 5th hackfest
+        vendor: OSM
+        version: '1.0'
+
+        # Management interface
+        mgmt-interface:
+            cp: eth0
+
+        # Atleast one VDU need to be specified
+        vdu:
+        -   id: ubuntu_slice-VM
+            name: ubuntu_slice-VM
+            description: ubuntu_slice-VM
+            count: 1
+
+            # Flavour of the VM to be instantiated for the VDU
+            # flavor below can fit into m1.micro
+            vm-flavor:
+                vcpu-count: 1
+                memory-mb: 1024
+                storage-gb: 10
+
+            # Image/checksum or image including the full path
+            image: 'cirros034'
+            #checksum: 
+
+            interface:
+            # Specify the external interfaces
+            # There can be multiple interfaces defined
+            -   name: eth0
+                type: EXTERNAL
+                virtual-interface:
+                    type: VIRTIO
+                    bandwidth: '0'
+                    vpci: 0000:00:0a.0
+                external-connection-point-ref: eth0
+            -   name: eth1
+                type: EXTERNAL
+                virtual-interface:
+                    type: VIRTIO
+                    bandwidth: '0'
+                    vpci: 0000:00:0a.0
+                external-connection-point-ref: eth1
+            -   name: eth2
+                type: EXTERNAL
+                virtual-interface:
+                    type: VIRTIO
+                    bandwidth: '0'
+                    vpci: 0000:00:0a.0
+                external-connection-point-ref: eth2
+
+        connection-point:
+        -   name: eth0
+            type: VPORT
+        -   name: eth1
+            type: VPORT
+        -   name: eth2
+            type: VPORT

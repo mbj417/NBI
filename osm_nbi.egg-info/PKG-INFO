@@ -1,0 +1,17 @@
+Metadata-Version: 1.0
+Name: osm-nbi
+Version: 6.0.1.post6+g1546f2a
+Summary: OSM North Bound Interface
+Home-page: https://osm.etsi.org/gitweb/?p=osm/NBI.git;a=summary
+Author: Alfonso Tierno
+Author-email: alfonso.tiernosepulveda@telefonica.com
+License: Apache 2.0
+Description: ===========
+        osm-nbi
+        ===========
+        
+        osm-nbi is the North Bound Interface for OSM, REST client serving json/yaml
+        It follows ETSI SOL005 recomendations
+        
+        
+Platform: UNKNOWN

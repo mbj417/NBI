@@ -1,0 +1,7 @@
+CherryPy==18.0.0
+osm-common
+jsonschema
+PyYAML
+osm-im
+python-keystoneclient
+requests
