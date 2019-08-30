@@ -995,21 +995,29 @@ class Server(object):
                         cherrypy.response.headers["Transaction-Id"] = _id
                     outdata = {"id": _id}
                 elif topic == "ns_instances_content":
-                    cherrypy.log.error("Instantiation received: indata = {}, kwargs = {}".format(json.dumps(indata), json.dumps(kwargs)))
-                    pla_suggestions = { 'received' : False, 'suggestions' : [] }
-                    def pla_callback(topic, command, data):
-                        pla_suggestions['suggestions'] = data['suggestions']
-                        pla_suggestions['received'] = True
+                    cherrypy.log("Instantiation received: indata = {}, kwargs = {}".format(json.dumps(indata), json.dumps(kwargs)))
+                    additionalNsParams = indata.get('additionalParamsForNs', {})
+                    placementEngine = additionalNsParams.get('placementEngine', None)
+                    if placementEngine == "PLA":
+                        cherrypy.log("Use PLA...");
+                        pla_suggestions = { 'received' : False, 'suggestions' : [] }
+                        def pla_callback(topic, command, data):
+                            pla_suggestions['suggestions'] = data['suggestions']
+                            pla_suggestions['received'] = True
 
-                    global subscription_thread
-                    subscription_thread.subscribe("pla", "suggestions", pla_callback)
-                    self.engine.msg.write("pla", "get_suggestions", indata);
-                    while not pla_suggestions['received']:
-                        time.sleep(1)
-                    subscription_thread.unsubscribe("pla", "suggestions")
-                    cherrypy.log.error("PLA suggestions received: {}".format(json.dumps(pla_suggestions['suggestions'])))
-                    # use first suggestion
-                    indata.update(pla_suggestions['suggestions'][0])
+                        global subscription_thread
+                        subscription_thread.subscribe("pla", "suggestions", pla_callback)
+                        self.engine.msg.write("pla", "get_suggestions", indata);
+                        wait = 30
+                        while not pla_suggestions['received']:
+                            time.sleep(1)
+                            wait -= 1
+                            if wait <= 0:
+                                raise NbiException("Placement timeout!", HTTPStatus.BAD_REQUEST)
+                        subscription_thread.unsubscribe("pla", "suggestions")
+                        cherrypy.log("Placement suggestions received: {}".format(json.dumps(pla_suggestions['suggestions'])))
+                        # use first suggestion
+                        indata.update(pla_suggestions['suggestions'][0])
                     # creates NSR
                     _id = self.engine.new_item(rollback, engine_session, engine_topic, indata, kwargs)
                     # creates nslcmop
