@@ -753,6 +753,17 @@ class NsLcmOpTopic(BaseTopic):
         }
         return nslcmop
 
+    def _get_enabled_vims(self, session):
+        db_filter = self._get_project_filter(session)
+        db_filter["_admin.operationalState"] = "ENABLED"
+        vims = self.db.get_list("vim_accounts", db_filter)
+        vimAccounts = []
+        for vim in vims:
+            vimAccounts.append(vim['_id'])
+        return vimAccounts
+                
+    
+
     def new(self, rollback, session, indata=None, kwargs=None, headers=None, slice_object=False):
         """
         Performs a new operation over a ns
@@ -807,6 +818,8 @@ class NsLcmOpTopic(BaseTopic):
 
             nslcmop_desc = self._create_nslcmop(nsInstanceId, operation, indata)
             self.format_on_new(nslcmop_desc, session["project_id"], make_public=session["public"])
+            _vims = self._get_enabled_vims(session)
+            nslcmop_desc['operationParams']['validVimAccounts'] = _vims
             _id = self.db.create("nslcmops", nslcmop_desc)
             rollback.append({"topic": "nslcmops", "_id": _id})
             if not slice_object:
